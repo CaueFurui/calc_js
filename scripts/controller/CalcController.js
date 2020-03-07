@@ -1,7 +1,8 @@
 class CalcController {
 
     constructor() {
-
+        this._audio = new Audio('click.mp3');
+        this._audioOnOff = false;
         this._lastNumber = '';
         this._lastOperator = '';
 
@@ -14,6 +15,33 @@ class CalcController {
         this.initialize();
         this.initButtonsEvents();
         this.initKeyboard();
+        this.pasteFromClipboard();
+    }
+
+    pasteFromClipboard() {
+        document.addEventListener('paste', e => {
+            let text = e.clipboardData.getData(("Text"));
+
+            this.displayCalc = parseFloat('text')
+
+            console.log(text);
+        })
+    }
+
+    copyToClipboard() {
+
+        let input = document.createElement('input');
+
+        input.value = this.displayCalc;
+
+        document.body.appendChild(input);
+
+        input.select();
+
+        document.execCommand("Copy");
+
+        input.remove();
+
     }
 
     initialize() {
@@ -24,13 +52,32 @@ class CalcController {
             this.setDisplayDateTime();
         }, 1000);
 
+        document.querySelectorAll(".btn-ac").forEach(btn => {
+            btn.addEventListener('dblclick', e => {
+                this.toggleAudio();
+            });
+        });
+    }
 
+    toggleAudio() {
+
+        this._audioOnOff = !this._audioOnOff;
+
+    }
+
+    playAudio() {
+
+        if (this._audioOnOff) {
+            this._audio.currentTime = 0;
+            this._audio.play;
+        }
     }
 
     initKeyboard() {
 
         document.addEventListener('keyup', e => {
 
+            this.playAudio();
 
 
             switch (e.key) {
@@ -75,6 +122,11 @@ class CalcController {
                     this.addOperation(parseInt(e.key));
 
                     break;
+                case 'c':
+                    if (e.ctrlKey) {
+                        this.copyToClipboard();
+                    }
+                    break
             }
         });
     }
@@ -265,6 +317,8 @@ class CalcController {
     }
 
     execBtn(value) {
+
+        this.playAudio();
 
         switch (value) {
 
